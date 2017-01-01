@@ -8,6 +8,7 @@ class Inventory extends React.Component {
     this.renderInventory = this.renderInventory.bind(this);
     this.renderLogin = this.renderLogin.bind(this);
     this.authenticate = this.authenticate.bind(this);
+    this.logout = this.logout.bind(this);
     this.authHandler = this.authHandler.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.state = {
@@ -15,6 +16,15 @@ class Inventory extends React.Component {
       owner: null
     }
 }
+
+    componentDidMount() {
+    base.onAuth((user) => {
+      if(user) {
+        this.authHandler(null, { user });
+      }
+    });
+  }
+
     handleChange(e, key) {
       const fish = this.props.fishes[key];
       const updatedFish = {
@@ -27,6 +37,11 @@ class Inventory extends React.Component {
     authenticate(provider) {
       console.log(`Trying to log in with ${provider}`);
       base.AuthWithOAuthPopup(provider, this.authHandler);
+    }
+
+    logout() {
+      base.unauth();
+      this.setState({ uid: null });
     }
 
     authHandler(err, authData) {
@@ -78,7 +93,7 @@ class Inventory extends React.Component {
     )
   }
   render() {
-    const logout = <button>Log Out</button>
+    const logout = <button onclick={() => this.logout()}>Log Out</button>
     //check if they are logged in
     if(!this.state.uid) {
       return <div>{this.renderLogin()}</div>
